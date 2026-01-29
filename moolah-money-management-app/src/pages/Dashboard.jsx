@@ -1,4 +1,7 @@
-import { Typography, Container, Box, CssBaseline } from '@mui/material';
+import { Typography, Container, Box, CssBaseline, Card, CardContent  } from '@mui/material';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 export default function Dashboard() {
   return (
@@ -13,6 +16,71 @@ export default function Dashboard() {
           </Typography>
         </Box>
         {/* todo: add budget button */}
+        {/* Active Budget Card */}
+        <Card sx={{ mb: 3, border: '1px solid var(--border)' }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Box>
+                <Typography variant="subtitle2" sx={{ color: 'var(--text-secondary)', mb: 0.5 }}>
+                  Active Budget
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  Budget Name Hardcoded
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Summary Cards */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
+              {/* Income Card */}
+              <Card sx={{ backgroundColor: '#DCFCE7', border: 'none', boxShadow: 'none' }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                    <TrendingUpIcon sx={{ color: 'var(--primary-green)', fontSize: 20 }} />
+                  </Box>
+                  <Typography variant="h5" sx={{ textAlign: 'center', fontWeight: 600, color: 'var(--primary-green)' }}>
+                    €6,500.00 hardcoded
+                  </Typography>
+                  <Typography variant="caption" sx={{ textAlign: 'center', display: 'block', color: 'var(--text-secondary)' }}>
+                    Monthly Income
+                  </Typography>
+                </CardContent>
+              </Card>
+
+              {/* Expenses Card */}
+              <Card sx={{ backgroundColor: '#FEE2E2', border: 'none', boxShadow: 'none' }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                    <TrendingDownIcon sx={{ color: 'var(--error)', fontSize: 20 }} />
+                  </Box>
+                  <Typography variant="h5" sx={{ textAlign: 'center', fontWeight: 600, color: 'var(--error)' }}>
+                    €0.00 hardcoded
+                  </Typography>
+                  <Typography variant="caption" sx={{ textAlign: 'center', display: 'block', color: 'var(--text-secondary)' }}>
+                    Monthly Expenses
+                  </Typography>
+                </CardContent>
+              </Card>
+
+              {/* Balance Card */}
+              <Card sx={{ backgroundColor: '#F3F4F6', border: 'none', boxShadow: 'none' }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                    <AccountBalanceWalletIcon sx={{ color: 'var(--text-secondary)', fontSize: 20 }} />
+                  </Box>
+                  <Typography variant="h5" sx={{ textAlign: 'center', fontWeight: 600 }}>
+                    €6,500.00 hardcoded
+                  </Typography>
+                  <Typography variant="caption" sx={{ textAlign: 'center', display: 'block', color: 'var(--text-secondary)' }}>
+                    Net Balance
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Box>
+          </CardContent>
+        </Card>
     </Container>
+
+    
   )
 }
