@@ -17,7 +17,7 @@ export default function Dashboard() {
         </Box>
         {/* todo: add budget button */}
         {/* Active Budget Card */}
-        <Card sx={{ mb: 3, border: '1px solid var(--border)' }}>
+        <Card sx={{ mb: 3, mt: 3, border: '1px solid var(--border)' }}>
           <CardContent>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Box>
