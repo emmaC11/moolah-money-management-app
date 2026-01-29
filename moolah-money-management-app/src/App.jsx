@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard.jsx'
 import Transactions from './pages/Transactions.jsx'
 import Budgets from './pages/Budgets.jsx'
 import Goals from './pages/Goals.jsx'
+import Navbar from './components/common/Navbar.jsx'
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 
@@ -14,6 +15,7 @@ function App() {
 
   return (
     <>
+     <Navbar />
      <Routes>
       {/* todo: add view based on logged in status */}
       <Route path="/" element={<Dashboard />} />
