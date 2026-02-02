@@ -1,7 +1,10 @@
-import { Typography, Container, Box, CssBaseline, Card, CardContent  } from '@mui/material';
+import { Typography, Container, Box, CssBaseline, Card, CardContent, Button, IconButton  } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export default function Dashboard() {
   return (
@@ -76,6 +79,49 @@ export default function Dashboard() {
                   </Typography>
                 </CardContent>
               </Card>
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* Active Budget Section*/}
+        <Card sx={{ border: '1px solid var(--border)' }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box sx={{ flex: 1 }}>
+                {/* todo: update hardcoded values */}
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
+                  Budget 1 Hardcoded
+                </Typography>
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2, mt: 1 }}>
+                  <Box>
+                    <Typography variant="caption" sx={{ color: 'var(--text-muted)' }}>Income</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>€11,850.00</Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ color: 'var(--text-muted)' }}>Expenses</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>€0.00</Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ color: 'var(--text-muted)' }}>Balance</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>€11,850.00</Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ color: 'var(--text-muted)' }}>Created</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>Dec 5, 2025</Typography>
+                  </Box>
+                  </Box>
+              </Box>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button size="small" startIcon={<MoreVertIcon />} sx={{ textTransform: 'none', color: 'var(--text-secondary)' }}>
+                  Set Active
+                </Button>
+                <IconButton size="small">
+                  <EditIcon fontSize="small" />
+                </IconButton>
+                <IconButton size="small" sx={{ color: 'var(--error)' }}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
             </Box>
           </CardContent>
         </Card>
