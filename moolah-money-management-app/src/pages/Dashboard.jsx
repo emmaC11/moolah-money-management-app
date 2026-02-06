@@ -1,132 +1,150 @@
-import { Typography, Container, Box, CssBaseline, Card, CardContent, Button, IconButton  } from '@mui/material';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import { Typography, Container, Box, Card, CardContent, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import SavingsIcon from '@mui/icons-material/Savings';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+
+  const navCards = [
+    {
+      title: '01 Create a Budget',
+      description: 'Set up a budget to track your income and stay on top of your expenses.',
+      icon: <AccountBalanceWalletIcon sx={{ fontSize: 32 }} />,
+      path: '/budgets',
+      backgroundColor: '#E0F2FE',
+      iconColor: '#0369A1'
+    },
+    {
+      title: '02 Add Transactions',
+      description: 'Track your spending habits with easy transaction entry. Remember to record each expense and income!',
+      icon: <ReceiptLongIcon sx={{ fontSize: 32 }} />,
+      path: '/transactions',
+      backgroundColor: '#FED7AA',
+      iconColor: '#C2410C'
+    },
+    {
+      title: '03 Set a Goal',
+      description: 'Create savings goals that match your dreams and aspirations for the future.',
+      icon: <SavingsIcon sx={{ fontSize: 32 }} />,
+      path: '/goals',
+      backgroundColor: '#E9D5FF',
+      iconColor: '#7C3AED'
+    },
+    {
+      title: '04 Review Progress',
+      description: 'See your progress, celebrate your wins, and adjust your strategy for continued success.',
+      icon: <TrendingUpIcon sx={{ fontSize: 32 }} />,
+      path: '/budgets',
+      backgroundColor: '#DCFCE7',
+      iconColor: '#16A34A'
+    }
+  ];
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      {/* Header Section */}
-        <Box>
-          <Typography variant="h4" sx={{color: 'var(--primary-green-dark)', fontWeight: 700, mb: 1 }}>
-            Budget Overview
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'var(--text-secondary)' }}>
-            Manage and compare all your budgets
-          </Typography>
-        </Box>
-        {/* todo: add budget button */}
-        {/* Active Budget Card */}
-        <Card sx={{ mb: 3, mt: 3, border: '1px solid var(--border)' }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Box>
-                <Typography variant="subtitle2" sx={{ color: 'var(--text-secondary)', mb: 0.5 }}>
-                  Active Budget
+    <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
+      {/* Hero Section */}
+      <Box sx={{ textAlign: 'center', mb: 6 }}>
+        <Typography 
+          variant="h3" 
+          sx={{ 
+            color: 'var(--text-primary)', 
+            fontWeight: 700, 
+            mb: 2 
+          }}
+        >
+          Moolah Money Management
+        </Typography>
+        <Typography 
+          variant="body1" 
+          sx={{ 
+            color: 'var(--text-secondary)',
+          }}
+        >
+          Your journey to financial wellness starts here. Follow these simple steps to take control of your money and grow your wealth.
+        </Typography>
+      </Box>
+
+      {/* Navigation Cards Grid */}
+      <Box sx={{ 
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+          gap: 3 
+        }}
+      >
+        {navCards.map((card) => (
+          <Card sx={{ 
+              backgroundColor: card.backgroundColor,
+              border: 'none',
+            }}
+          >
+            <CardContent sx={{ p: 5 }}>
+              {/* Icon */}
+              <Box 
+                sx={{ 
+                  width: 56, 
+                  height: 56, 
+                  borderRadius: 2,
+                  backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mb: 3,
+                  color: card.iconColor
+                }}
+              >
+                {card.icon}
+              </Box>
+
+              {/* Content */}
+              <Box sx={{ mb: 3 }}>
+                <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    mb: 1
+                  }}
+                >
+                  {card.title}
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Budget Name Hardcoded
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.6
+                  }}
+                >
+                  {card.description}
                 </Typography>
               </Box>
-            </Box>
 
-            {/* Summary Cards */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
-              {/* Income Card */}
-              <Card sx={{ backgroundColor: '#DCFCE7', border: 'none', boxShadow: 'none' }}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                    <TrendingUpIcon sx={{ color: 'var(--primary-green)', fontSize: 20 }} />
-                  </Box>
-                  <Typography variant="h5" sx={{ textAlign: 'center', fontWeight: 600, color: 'var(--primary-green)' }}>
-                    €6,500.00 hardcoded
-                  </Typography>
-                  <Typography variant="caption" sx={{ textAlign: 'center', display: 'block', color: 'var(--text-secondary)' }}>
-                    Monthly Income
-                  </Typography>
-                </CardContent>
-              </Card>
-
-              {/* Expenses Card */}
-              <Card sx={{ backgroundColor: '#FEE2E2', border: 'none', boxShadow: 'none' }}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                    <TrendingDownIcon sx={{ color: 'var(--error)', fontSize: 20 }} />
-                  </Box>
-                  <Typography variant="h5" sx={{ textAlign: 'center', fontWeight: 600, color: 'var(--error)' }}>
-                    €0.00 hardcoded
-                  </Typography>
-                  <Typography variant="caption" sx={{ textAlign: 'center', display: 'block', color: 'var(--text-secondary)' }}>
-                    Monthly Expenses
-                  </Typography>
-                </CardContent>
-              </Card>
-
-              {/* Balance Card */}
-              <Card sx={{ backgroundColor: '#F3F4F6', border: 'none', boxShadow: 'none' }}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                    <AccountBalanceWalletIcon sx={{ color: 'var(--text-secondary)', fontSize: 20 }} />
-                  </Box>
-                  <Typography variant="h5" sx={{ textAlign: 'center', fontWeight: 600 }}>
-                    €6,500.00 hardcoded
-                  </Typography>
-                  <Typography variant="caption" sx={{ textAlign: 'center', display: 'block', color: 'var(--text-secondary)' }}>
-                    Net Balance
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Box>
-          </CardContent>
-        </Card>
-
-        {/* Active Budget Section*/}
-        <Card sx={{ border: '1px solid var(--border)' }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Box sx={{ flex: 1 }}>
-                {/* todo: update hardcoded values */}
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
-                  Budget 1 Hardcoded
-                </Typography>
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2, mt: 1 }}>
-                  <Box>
-                    <Typography variant="caption" sx={{ color: 'var(--text-muted)' }}>Income</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>€11,850.00</Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" sx={{ color: 'var(--text-muted)' }}>Expenses</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>€0.00</Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" sx={{ color: 'var(--text-muted)' }}>Balance</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>€11,850.00</Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="caption" sx={{ color: 'var(--text-muted)' }}>Created</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>Dec 5, 2025</Typography>
-                  </Box>
-                  </Box>
-              </Box>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button size="small" startIcon={<MoreVertIcon />} sx={{ textTransform: 'none', color: 'var(--text-secondary)' }}>
-                  Set Active
-                </Button>
-                <IconButton size="small">
-                  <EditIcon fontSize="small" />
-                </IconButton>
-                <IconButton size="small" sx={{ color: 'var(--error)' }}>
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
+              {/* Button */}
+              <Button
+                endIcon={<ArrowForwardIcon />}
+                onClick={() => handleNavigation(card.path)}
+                sx={{
+                  backgroundColor: card.iconColor,
+                  color: 'white',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  px: 3,
+                  py: 1,
+                }}
+              >
+                Get Started
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
     </Container>
-
-    
-  )
+  );
 }
