@@ -12,10 +12,16 @@ VALUES ('Food & Dining', 'expense', '🍔', '#FF6B6B'),
 ('Investment', 'income', '📈', '#FFD43B'),
 ('Gift', 'income', '🎁', '#FF8787'),
 ('Other', 'income', '💵', '#A8E6CF');
+('Savings','savings','🐖', '#4D96FF');
 
 
-INSERT INTO Users (username, email, password_hash)
-VALUES ('testuser', 'test@moolah.com', '$2b$10$...');
+mVALUES ('testuser', 'test@moolah.com', '$2b$10$...'),
+('janedoe', 'jane@moolah.com', '$2b$10$...');
+
+INSERT INTO Membership (user_id, membership_type, start_date, end_date)
+VALUES (1, 'premium', '2026-01-01', '2026-12-31'),
+(2, 'free', '2026-01-01', NULL);
+
 
 INSERT INTO Transactions (user_id, category_id, amount, description, type, date)
 VALUES (1, 1, 35.50, 'Grocery shopping', 'expense', '2026-01-15'),
