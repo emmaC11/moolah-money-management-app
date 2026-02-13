@@ -2,19 +2,14 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebase";
 
 import Navbar from "./components/common/Navbar.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Transactions from "./pages/Transactions.jsx";
 import Budgets from "./pages/Budgets.jsx";
 import Goals from "./pages/Goals.jsx";
-
-// ⬇️ Make sure this path matches your actual Login component location.
-// If your file is src/components/Login.jsx, use the line below:
-import Login from "./components/login/login.jsx";
-
-// Firebase auth instance exported from src/firebase.js
-import { auth } from "./firebase";
+import Login from "./pages/Login.jsx";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -30,11 +25,11 @@ function App() {
   }, []);
 
   if (checking) {
-    // Optional: nicer loading UI
+    
     return <div style={{ padding: 24 }}>Loading…</div>;
   }
 
-  // Not logged in → show Login page only
+ 
   if (!user) {
     return (
       <div style={{ padding: 24 }}>
