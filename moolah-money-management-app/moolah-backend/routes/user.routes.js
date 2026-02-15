@@ -1,21 +1,20 @@
-const express = require('express');
-const router = express.Router();
+// routes/user.routes.js
+import { Router } from 'express';
+import auth from '../middleware/authFirebase.js';
+import { me, updateMe, upsertMe, getById, updateById, removeById } from '../controllers/user.controller.js';
 
-const auth = require('../middleware/authFirebase');
-const ctrl = require('../controllers/user.controller');
-const asyncHandler = require('../utils/asyncHandler');
-
-// All user endpoints require authentication
+const router = Router();
 router.use(auth);
 
 // Current user
-router.get('/me',  asyncHandler(ctrl.me));
-router.put('/me',  asyncHandler(ctrl.updateMe));
-router.post('/',   asyncHandler(ctrl.upsertMe)); // upsert current user's profile
+router.get('/me', me);
+router.put('/me', updateMe);
+// Upsert current user's profile (POST to /users)
+router.post('/', upsertMe);
 
-// Admin endpoints (get/update/delete by UID)
-router.get('/:uid',    asyncHandler(ctrl.getById));
-router.put('/:uid',    asyncHandler(ctrl.updateById));
-router.delete('/:uid', asyncHandler(ctrl.removeById));
+// Admin endpoints (require your admin check inside controller)
+router.get('/:uid', getById);
+router.put('/:uid', updateById);
+router.delete('/:uid', removeById);
 
-module.exports = router;
+export default router;

@@ -1,32 +1,51 @@
-require('dotenv').config();
-const express = require('express');
-const axios = require('axios');
-const admin = require('./firebase/admin');
+// server.js (ESM + global authFirebase)
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+
+// Global auth middleware (ESM)
+import authFirebase from './middleware/authFirebase.js';
+
+// Routers (ESM)
+import budgetRoutes from './routes/budget.routes.js';
+import categoryRoutes from './routes/category.routes.js';
+import goalRoutes from './routes/goal.routes.js';
+import transactionRoutes from './routes/transaction.routes.js';
+import userRoutes from './routes/user.routes.js';
+
 const app = express();
 
+// Core middleware
 app.use(express.json());
 
-const cors = require('cors');
-app.use(cors({ origin: 'http://localhost:5173' })); // NEEDS TO MATCH FRONTEND PORT
+// CORS: configure via .env or fall back to Vite default
+const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
+app.use(cors({ origin: allowedOrigin }));
 
+// API base
+const API_BASE = '/api/v1';
 
-// Routes
-app.use('/api/v1/transactions', require('./routes/transaction.routes'));
-app.use('/api/v1/budgets', require('./routes/budget.routes'));
-app.use('/api/v1/goals', require('./routes/goal.routes'));
-app.use('/api/v1/categories', require('./routes/category.routes'));
-app.use('/api/v1/user', require('./routes/user.routes'));
+// ✅ Apply Firebase Auth to all API v1 endpoints
+app.use(API_BASE, authFirebase);
 
-// Health check
-app.get('/health', (req, res) => {
+// Mount routes (all protected by authFirebase above)
+app.use(`${API_BASE}/budgets`, budgetRoutes);
+app.use(`${API_BASE}/categories`, categoryRoutes);
+app.use(`${API_BASE}/goals`, goalRoutes);
+app.use(`${API_BASE}/transactions`, transactionRoutes);
+app.use(`${API_BASE}/user`, userRoutes);
+
+// Public health check (left unauthenticated on purpose)
+app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok', time: new Date().toISOString() });
 });
 
-// Minimal terminal error handler
+// Central error handler (simple and safe)
 app.use((err, _req, res, _next) => {
   console.error(err);
-  res.status(500).json({ success: false, message: 'Internal Server Error' });
+  res.status(500).json({ success: false, error: 'Internal server error' });
 });
 
-const port = process.env.PORT || 3000;
+// Start server
+const port = Number(process.env.PORT) || 3000;
 app.listen(port, () => console.log(`API listening on :${port}`));

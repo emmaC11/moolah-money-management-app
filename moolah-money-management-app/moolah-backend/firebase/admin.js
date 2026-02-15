@@ -1,7 +1,16 @@
-var admin = require("firebase-admin");
+// moolah-backend/firebase/admin.js
+import admin from 'firebase-admin';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 
-var serviceAccount = require("path/to/serviceAccountKey.json");
+const serviceAccountPath = resolve(process.cwd(), 'secrets', 'serviceAccountKey.json');
+const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    // storageBucket: '<your-project-id>.appspot.com',         // if using Storage
+  });
+}
+
+export default admin;

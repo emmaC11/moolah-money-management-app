@@ -1,80 +1,127 @@
-const pool = require('../config/database');
+// controllers/transaction.controller.js
+import { pool } from '../config/database.js';
 
-exports.list = async (req, res) => {
-  const { uid } = req.user;                 // <<< use uid
-  const {
-    type, category_id, start_date, end_date, search,
-    page = 1, limit = 20
-  } = req.query;
+// Helpers
+function getPaging(qs, { defaultLimit = 20, maxLimit = 200 } = {}) {
+  const limit = Math.min(Math.max(parseInt(qs.limit ?? defaultLimit, 10) || defaultLimit, 1), maxLimit);
+  const page = Math.max(parseInt(qs.page ?? '1', 10) || 1, 1);
+  const offset = (page - 1) * limit;
+  return { page, limit, offset };
+}
+function isISODate(v) {
+  return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+}
 
-  const clauses = ['t.user_uid = ?'];       // <<< scope by user_uid
-  const params = [uid];
+export const list = async (req, res) => {
+  try {
+    const uid = req?.user?.uid;
+    if (!uid) return res.status(401).json({ success: false, error: 'Unauthenticated' });
 
-  if (type && ['income', 'expense'].includes(type)) { clauses.push('t.type = ?'); params.push(type); }
-  if (category_id) { clauses.push('t.category_id = ?'); params.push(Number(category_id)); }
-  if (start_date) { clauses.push('t.date >= ?'); params.push(start_date); }
-  if (end_date) { clauses.push('t.date <= ?'); params.push(end_date); }
-  if (search) { clauses.push('t.description LIKE ?'); params.push(`%${search}%`); }
+    const { type, category_id, start_date, end_date, search } = req.query;
+    const { page, limit, offset } = getPaging(req.query);
 
-  const where = clauses.join(' AND ');
-  const offset = (Number(page) - 1) * Number(limit);
+    const where = ['t.user_uid = ?'];
+    const params = [uid];
 
-  const sql = `
-    SELECT t.transaction_id, t.user_uid, t.category_id, c.name AS category_name,
-           t.amount, t.description, t.type, t.date, t.created_at
-    FROM transactions t                                  -- <<< lower-case, match schema
-    JOIN categories c ON c.category_id = t.category_id
-    WHERE ${where}
-    ORDER BY t.date DESC, t.transaction_id DESC
-    LIMIT ? OFFSET ?`;
-
-  const countSql = `SELECT COUNT(*) AS total FROM transactions t WHERE ${where}`;
-
-  const [rows] = await pool.execute(sql, [...params, Number(limit), offset]);
-  const [cnt] = await pool.execute(countSql, params);
-
-  res.json({
-    success: true,
-    data: rows,
-    pagination: {
-      total: cnt[0].total,
-      page: Number(page),
-      limit: Number(limit),
-      totalPages: Math.max(1, Math.ceil(cnt[0].total / Number(limit))) // <<< fix stray "1"
+    if (type && ['income', 'expense'].includes(type)) {
+      where.push('t.type = ?'); params.push(type);
     }
-  });
+    if (category_id) { where.push('t.category_id = ?'); params.push(Number(category_id)); }
+    if (start_date) {
+      if (!isISODate(start_date)) return res.status(400).json({ success: false, error: 'start_date must be YYYY-MM-DD' });
+      where.push('t.date >= ?'); params.push(start_date);
+    }
+    if (end_date) {
+      if (!isISODate(end_date)) return res.status(400).json({ success: false, error: 'end_date must be YYYY-MM-DD' });
+      where.push('t.date <= ?'); params.push(end_date);
+    }
+    if (search) { where.push('t.description LIKE ?'); params.push(`%${search}%`); }
+
+    const sql = `
+      SELECT t.transaction_id, t.user_uid, t.category_id, c.name AS category_name,
+             t.amount, t.description, t.type, t.date, t.created_at
+        FROM transactions t
+        JOIN categories c ON c.category_id = t.category_id
+       WHERE ${where.join(' AND ')}
+       ORDER BY t.date DESC, t.transaction_id DESC
+       LIMIT ? OFFSET ?`;
+    const countSql = `SELECT COUNT(*) AS total FROM transactions t WHERE ${where.join(' AND ')}`;
+
+    const [rows] = await pool.execute(sql, [...params, limit, offset]);
+    const [cnt] = await pool.execute(countSql, params);
+
+    return res.json({
+      success: true,
+      data: rows,
+      pagination: {
+        total: cnt[0].total,
+        page,
+        limit,
+        totalPages: Math.max(1, Math.ceil(cnt[0].total / limit)),
+      },
+    });
+  } catch (err) {
+    console.error('transactions.list error', err);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
+  }
 };
 
-exports.create = async (req, res) => {
-  const { uid } = req.user;                 // <<< use uid
-  const { category_id, amount, description = '', type, date } = req.body;
+export const create = async (req, res) => {
+  try {
+    const uid = req?.user?.uid;
+    if (!uid) return res.status(401).json({ success: false, error: 'Unauthenticated' });
 
-  if (!category_id || !amount || !type || !date)
-    return res.status(400).json({ success: false, message: 'Missing required fields' });
+    const { category_id, amount, description = '', type, date } = req.body;
 
-  if (!['income','expense'].includes(type))
-    return res.status(400).json({ success: false, message: 'Invalid type' });
+    if (!category_id || amount == null || !type || !date) {
+      return res.status(400).json({ success: false, error: 'category_id, amount, type and date are required' });
+    }
+    if (!['income', 'expense'].includes(type)) {
+      return res.status(400).json({ success: false, error: 'type must be income or expense' });
+    }
+    const amt = Number(amount);
+    if (!Number.isFinite(amt) || amt <= 0) {
+      return res.status(400).json({ success: false, error: 'amount must be a positive number' });
+    }
+    if (!isISODate(date)) {
+      return res.status(400).json({ success: false, error: 'date must be YYYY-MM-DD' });
+    }
 
-  if (Number(amount) <= 0)
-    return res.status(400).json({ success: false, message: 'Amount must be positive' });
+    // Ensure category exists for this user and matches type
+    const [catRows] = await pool.execute(
+      'SELECT type AS category_type FROM categories WHERE category_id = ? AND user_uid = ?',
+      [Number(category_id), uid]
+    );
+    if (!catRows[0]) {
+      return res.status(400).json({ success: false, error: 'Invalid category_id' });
+    }
+    if (catRows[0].category_type !== type) {
+      return res.status(400).json({
+        success: false,
+        error: `Category type (${catRows[0].category_type}) does not match transaction type (${type})`,
+      });
+    }
 
-  // Ensure category type matches (and same user)
-  const [catRows] = await pool.execute(
-    'SELECT type AS category_type FROM categories WHERE category_id = ? AND user_uid = ?',
-    [Number(category_id), uid]
-  );
-  if (!catRows[0]) return res.status(400).json({ success: false, message: 'Invalid category_id' });
-  if (catRows[0].category_type !== type)
-    return res.status(400).json({ success: false, message: `Category type (${catRows[0].category_type}) does not match transaction type (${type})` });
+    const [result] = await pool.execute(
+      `INSERT INTO transactions (user_uid, category_id, amount, description, type, date)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [uid, Number(category_id), amt, description, type, date]
+    );
 
-  const [result] = await pool.execute(`
-    INSERT INTO transactions (user_uid, category_id, amount, description, type, date)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `, [uid, Number(category_id), Number(amount), description, type, date]);
-
-  res.status(201).json({
-    success: true,
-    message: 'Transaction created successfully',
-    data: { transaction_id: result.insertId, user_uid: uid, category_id, amount, description, type, date }
-  });
+    return res.status(201).json({
+      success: true,
+      data: {
+        transaction_id: result.insertId,
+        user_uid: uid,
+        category_id: Number(category_id),
+        amount: amt,
+        description,
+        type,
+        date,
+      },
+    });
+  } catch (err) {
+    console.error('transactions.create error', err);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
+  }
 };

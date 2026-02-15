@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Environment variables
+.env
+.env.*
+!.env.example
+# Ignore secrets and service account keys
+secrets/
+serviceAccountKey.json
